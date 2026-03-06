@@ -38,6 +38,7 @@ OvmsVehicleCadillaccCT5* MyCadillaccCT5 = NULL;
 
 static const OvmsPoller::poll_pid_t obdii_polls[] =
   {
+#ifdef notdef
     // Engine coolant temp
     { 0x7df, 0, VEHICLE_POLL_TYPE_OBDIICURRENT, 0x05, {  0, 30 }, 0, ISOTP_STD },
     // Engine RPM
@@ -46,12 +47,15 @@ static const OvmsPoller::poll_pid_t obdii_polls[] =
     { 0x7df, 0, VEHICLE_POLL_TYPE_OBDIICURRENT, 0x0d, {  0, 10 }, 0, ISOTP_STD },
     // Engine air intake temp
     { 0x7df, 0, VEHICLE_POLL_TYPE_OBDIICURRENT, 0x0f, {  0, 30 }, 0, ISOTP_STD },
+#endif
     // Fuel level
     { 0x7df, 0, VEHICLE_POLL_TYPE_OBDIICURRENT, 0x2f, {  0, 30 }, 0, ISOTP_STD },
-    // Ambiant temp
+    // Ambient temp
     { 0x7df, 0, VEHICLE_POLL_TYPE_OBDIICURRENT, 0x46, {  0, 30 }, 0, ISOTP_STD },
+#ifdef notdef
     // Engine oil temp
     { 0x7df, 0, VEHICLE_POLL_TYPE_OBDIICURRENT, 0x5c, {  0, 30 }, 0, ISOTP_STD },
+#endif
     POLL_LIST_END
   };
 
