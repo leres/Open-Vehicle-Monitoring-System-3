@@ -36,9 +36,9 @@ static const char *TAG = "v-cadillacct5";
 
 OvmsVehicleCadillaccCT5* MyCadillaccCT5 = NULL;
 
+#ifdef notdef
 static const OvmsPoller::poll_pid_t obdii_polls[] =
   {
-#ifdef notdef
     // Engine coolant temp
     { 0x7df, 0, VEHICLE_POLL_TYPE_OBDIICURRENT, 0x05, {  0, 30 }, 0, ISOTP_STD },
     // Engine RPM
@@ -47,26 +47,25 @@ static const OvmsPoller::poll_pid_t obdii_polls[] =
     { 0x7df, 0, VEHICLE_POLL_TYPE_OBDIICURRENT, 0x0d, {  0, 10 }, 0, ISOTP_STD },
     // Engine air intake temp
     { 0x7df, 0, VEHICLE_POLL_TYPE_OBDIICURRENT, 0x0f, {  0, 30 }, 0, ISOTP_STD },
-#endif
     // Fuel level
     { 0x7df, 0, VEHICLE_POLL_TYPE_OBDIICURRENT, 0x2f, {  0, 30 }, 0, ISOTP_STD },
     // Ambient temp
     { 0x7df, 0, VEHICLE_POLL_TYPE_OBDIICURRENT, 0x46, {  0, 30 }, 0, ISOTP_STD },
-#ifdef notdef
     // Engine oil temp
     { 0x7df, 0, VEHICLE_POLL_TYPE_OBDIICURRENT, 0x5c, {  0, 30 }, 0, ISOTP_STD },
-#endif
     POLL_LIST_END
   };
+#endif
 
 OvmsVehicleCadillaccCT5::OvmsVehicleCadillaccCT5()
   {
   ESP_LOGI(TAG, "Cadillac CT5 vehicle module");
   memset(m_vin, 0, sizeof(m_vin));
   RegisterCanBus(1, CAN_MODE_ACTIVE, CAN_SPEED_500KBPS);
-  // RegisterCanBus(2, CAN_MODE_ACTIVE, CAN_SPEED_33KBPS);
+#ifdef notdef
   PollSetPidList(m_can1, obdii_polls);
   PollSetState(0);
+#endif
   MyCadillaccCT5 = this;
   }
 
@@ -99,7 +98,9 @@ void OvmsVehicleCadillaccCT5::IncomingFrameCan1(CAN_frame_t* p_frame)
           ESP_LOGI(TAG, "running: \"%s\"", isRunning ? "yes" : "no");
           StdMetrics.ms_v_env_on->SetValue(isRunning);
           StdMetrics.ms_v_env_charging12v->SetValue(isRunning);
+#ifdef notdef
           PollSetState(isRunning ? 1 : 0);
+#endif
           }
         }
       break;
@@ -145,6 +146,7 @@ void OvmsVehicleCadillaccCT5::IncomingFrameCan1(CAN_frame_t* p_frame)
     }
   }
 
+#ifdef notdef
 void
 OvmsVehicleCadillaccCT5::IncomingPollReply(const OvmsPoller::poll_job_t &job, uint8_t* data, uint8_t length)
   {
@@ -200,6 +202,7 @@ OvmsVehicleCadillaccCT5::IncomingPollReply(const OvmsPoller::poll_job_t &job, ui
       break;
     }
   }
+#endif
 
 class OvmsVehicleCadillaccCT5Init
   {

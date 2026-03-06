@@ -41,8 +41,10 @@ class OvmsVehicleCadillaccCT5 : public OvmsVehicle
     OvmsVehicleCadillaccCT5();
     ~OvmsVehicleCadillaccCT5();
 
+#ifdef notdef
   protected:
     void IncomingPollReply(const OvmsPoller::poll_job_t &job, uint8_t* data, uint8_t length) override;
+#endif
 
   public:
     void IncomingFrameCan1(CAN_frame_t* p_frame) override;
