@@ -78,11 +78,11 @@ OvmsVehicleCadillaccCT5::~OvmsVehicleCadillaccCT5()
 
 void OvmsVehicleCadillaccCT5::IncomingFrameCan1(CAN_frame_t* p_frame)
   {
-  uint8_t *d;
-  bool isRunning;
+  // uint8_t *d;
+  // bool isRunning;
 
   processing = 1;
-  d = p_frame->data.u8;
+  // d = p_frame->data.u8;
 
   switch (p_frame->MsgID)
     {
@@ -212,14 +212,18 @@ void OvmsVehicleCadillaccCT5::IncomingFrameCan1(CAN_frame_t* p_frame)
 
 void OvmsVehicleCadillaccCT5::IncomingFrameCan2(CAN_frame_t* p_frame)
   {
+#ifdef notdef
   int i, len;
   uint8_t *d;
+#endif
 
   processing = 1;
+#ifdef notdef
   d = p_frame->data.u8;
   len = p_frame->FIR.B.DLC;
   if (len > sizeof(p_frame->data))
     len = sizeof(p_frame->data);
+#endif
 
   switch (p_frame->MsgID)
     {
@@ -264,7 +268,7 @@ void OvmsVehicleCadillaccCT5::IncomingFrameCan2(CAN_frame_t* p_frame)
 void
 OvmsVehicleCadillaccCT5::IncomingPollReply(const OvmsPoller::poll_job_t &job, uint8_t* data, uint8_t length)
   {
-  int value1 = (int)data[0];
+  // int value1 = (int)data[0];
 
   switch (job.pid)
     {
@@ -312,7 +316,7 @@ OvmsVehicleCadillaccCT5::IncomingPollReply(const OvmsPoller::poll_job_t &job, ui
 #endif
 
     default:
-      ESP_LOGI(TAG, "IncomingPollReply: pid 0x04%", job.pid);
+      ESP_LOGI(TAG, "IncomingPollReply: pid %04x", job.pid);
       break;
     }
   }
