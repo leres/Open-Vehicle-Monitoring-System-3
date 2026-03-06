@@ -46,7 +46,6 @@ class OvmsVehicleCadillaccCT5 : public OvmsVehicle
 
   public:
     void IncomingFrameCan1(CAN_frame_t* p_frame) override;
-    void IncomingFrameCan2(CAN_frame_t* p_frame) override;
 
   public:
     virtual vehicle_command_t CommandWakeup(void) override;

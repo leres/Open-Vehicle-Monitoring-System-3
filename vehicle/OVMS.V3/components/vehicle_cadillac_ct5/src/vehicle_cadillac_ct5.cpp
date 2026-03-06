@@ -78,11 +78,15 @@ OvmsVehicleCadillaccCT5::~OvmsVehicleCadillaccCT5()
 
 void OvmsVehicleCadillaccCT5::IncomingFrameCan1(CAN_frame_t* p_frame)
   {
-  // uint8_t *d;
+  int i, len;
+  uint8_t *d;
   // bool isRunning;
 
   processing = 1;
-  // d = p_frame->data.u8;
+  d = p_frame->data.u8;
+  len = p_frame->FIR.B.DLC;
+  if (len > sizeof(p_frame->data))
+    len = sizeof(p_frame->data);
 
   switch (p_frame->MsgID)
     {
@@ -100,8 +104,23 @@ void OvmsVehicleCadillaccCT5::IncomingFrameCan1(CAN_frame_t* p_frame)
       break;
 #endif
 
-#ifdef notdef
-    case 0x514:
+    case 0x49B:
+      /* Last 8 of vin */
+      if (m_vin[1 + 8] == '\0') {
+        i = len;
+        if (i > 8)
+          i = 8;
+        memcpy(m_vin + 1 + 8, d, i);
+        /* Publish once we have the whole VIN */
+        if (m_vin[0] != '\0')
+	  {
+          StandardMetrics.ms_v_vin->SetValue(m_vin);
+	  ESP_LOGI(TAG, "VIN: %s (pid %04x)", m_vin, p_frame->MsgID);
+	  }
+      }
+      break;
+
+    case 0x75F:
       /* First 8 of vin */
       if (m_vin[0] == '\0') {
         i = len;
@@ -112,152 +131,12 @@ void OvmsVehicleCadillaccCT5::IncomingFrameCan1(CAN_frame_t* p_frame)
         memcpy(m_vin + 1, d, i);
         /* Publish once we have the whole VIN */
         if (m_vin[1 + 8] != '\0')
+	  {
           StandardMetrics.ms_v_vin->SetValue(m_vin);
+	  ESP_LOGI(TAG, "VIN: %s (pid %04x)", m_vin, p_frame->MsgID);
+	  }
       }
       break;
-#endif
-
-#ifdef notdef
-    case 0x4E1:
-      /* Last 8 of vin */
-      if (m_vin[1 + 8] == '\0') {
-        i = len;
-        if (i > 8)
-          i = 8;
-        memcpy(m_vin + 1 + 8, d, i);
-        /* Publish once we have the whole VIN */
-        if (m_vin[0] != '\0')
-          StandardMetrics.ms_v_vin->SetValue(m_vin);
-      }
-      break;
-#endif
-
-#ifdef notdef
-    case 0x0C9:
-      /* Throttle percentage */
-      StandardMetrics.ms_v_env_throttle->SetValue(d[1]);
-      break;
-#endif
-
-#ifdef notdef
-    case 0x0f1:
-      /* ??? d[1]  brake 0-100% (0-254) */
-      StandardMetrics.ms_v_env_footbrake->SetValue(d[2]);
-      // StandardMetrics.ms_v_env_handbrake->SetValue(?);
-      break;
-#endif
-
-#ifdef notdef
-    case 0x120:
-      /* ??? Might be locks (vehicle_kiasoulev) */
-      break;
-#endif
-
-#ifdef notdef
-    case 0x1f5:
-      // ??? d[3] is transmission gear: ?? might only know R, N and other
-      // 1=park, 2=reverse, F=neutral, ?=drive, ?=low ??
-      // 0x20 is probably reverse
-      // Gear/direction; negative=reverse, 0=neutral [1]
-      StandardMetrics.ms_v_env_gear->SetValue(?);
-      break;
-#endif
-
-#ifdef notdef
-    case 0x771:
-      /* ??? Might be open/lock doors (vehicle_kiasoulev) */
-      StandardMetrics.ms_v_door_fl->SetValue(?);
-      StandardMetrics.ms_v_door_fr->SetValue(?);
-      StandardMetrics.ms_v_door_rl->SetValue(?);
-      StandardMetrics.ms_v_door_rr->SetValue(?);
-
-      StandardMetrics.ms_v_door_hood->SetValue(?);
-      StandardMetrics.ms_v_door_trunk->SetValue(?);
-      break;
-#endif
-
-#ifdef notdef
-    case 0x4c1:
-      /* ??? Ambient temperature (probably wrong) */
-      /* ??? probably pressure (psi) of some kind */
-      StandardMetrics.ms_v_env_temp->SetValue(F2C(d[4] - 0x28));
-      // Cabin temperature
-      StandardMetrics.ms_v_env_cabintemp->SetValue(F2C(?));
-      break;
-#endif
-
-#ifdef notdef
-    case 0x???:
-      /* ??? Speed */
-      StandardMetrics.ms_v_pos_speed->SetValue(?);
-#endif
-
-#ifdef notdef
-    case 0x???:
-      /* ??? Odometer */
-      StandardMetrics.ms_v_pos_odometer->SetValue(?);
-#endif
-
-#ifdef notdef
-    case 0x???:
-      /* ??? TMPS */
-      break;
-#endif
-
-    default:
-      break;
-    }
-  processing = 0;
-  }
-
-void OvmsVehicleCadillaccCT5::IncomingFrameCan2(CAN_frame_t* p_frame)
-  {
-#ifdef notdef
-  int i, len;
-  uint8_t *d;
-#endif
-
-  processing = 1;
-#ifdef notdef
-  d = p_frame->data.u8;
-  len = p_frame->FIR.B.DLC;
-  if (len > sizeof(p_frame->data))
-    len = sizeof(p_frame->data);
-#endif
-
-  switch (p_frame->MsgID)
-    {
-#ifdef notdef
-    case 0x10024040:
-      /* First 8 of vin */
-      if (m_vin[0] == '\0') {
-        i = len;
-        if (i > 8)
-          i = 8;
-        /* The World Manufacturer number: United States */
-        m_vin[0] = '1';
-        memcpy(m_vin + 1, d, i);
-        /* Publish once we have the whole VIN */
-        if (m_vin[1 + 8] != '\0')
-          StandardMetrics.ms_v_vin->SetValue(m_vin);
-      }
-      break;
-#endif
-
-#ifdef notdef
-    case 0x10026040:
-      /* Last 8 of vin */
-      if (m_vin[1 + 8] == '\0') {
-        i = len;
-        if (i > 8)
-          i = 8;
-        memcpy(m_vin + 1 + 8, d, i);
-        /* Publish once we have the whole VIN */
-        if (m_vin[0] != '\0')
-          StandardMetrics.ms_v_vin->SetValue(m_vin);
-      }
-      break;
-#endif
 
     default:
       break;
