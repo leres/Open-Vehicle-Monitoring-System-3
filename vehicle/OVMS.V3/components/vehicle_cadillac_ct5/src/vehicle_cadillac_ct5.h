@@ -47,14 +47,6 @@ class OvmsVehicleCadillaccCT5 : public OvmsVehicle
   public:
     void IncomingFrameCan1(CAN_frame_t* p_frame) override;
 
-  public:
-    virtual vehicle_command_t CommandWakeup(void) override;
-    virtual vehicle_command_t CommandLock(const char* pin) override;
-    virtual vehicle_command_t CommandUnlock(const char* pin) override;
-
-  private:
-    void Ticker10(uint32_t ticker) override;
-
   protected:
     char m_vin[18];
   };

@@ -80,7 +80,7 @@ void OvmsVehicleCadillaccCT5::IncomingFrameCan1(CAN_frame_t* p_frame)
   {
   int i, len;
   uint8_t *d;
-  // bool isRunning;
+  bool isRunning;
 
   processing = 1;
   d = p_frame->data.u8;
@@ -90,10 +90,9 @@ void OvmsVehicleCadillaccCT5::IncomingFrameCan1(CAN_frame_t* p_frame)
 
   switch (p_frame->MsgID)
     {
-#ifdef notdef
-    case 0x134:
+    case 0x063:
       /* Unknown pid tells us when the engine is running */
-      isRunning = (d[2] != 0);
+      isRunning = (d[3] != 0);
       if (StandardMetrics.ms_v_env_on->AsBool() != isRunning)
         {
         ESP_LOGI(TAG, "running: \"%s\"", isRunning ? "yes" : "no");
@@ -102,7 +101,6 @@ void OvmsVehicleCadillaccCT5::IncomingFrameCan1(CAN_frame_t* p_frame)
         PollSetState(isRunning ? 1 : 0);
         }
       break;
-#endif
 
     case 0x49B:
       /* Last 8 of vin */
@@ -213,73 +211,4 @@ OvmsVehicleCadillaccCT5Init::OvmsVehicleCadillaccCT5Init()
     "Cadillac CT5");
   if (!StandardMetrics.ms_v_env_on->AsBool())
       StandardMetrics.ms_v_env_on->SetValue(false);
-  }
-
-// XXX from vehicle_nissanleaf.cpp
-/**
- * Ticker10: Called every ten seconds
- */
-void OvmsVehicleCadillaccCT5::Ticker10(uint32_t ticker)
-  {
-  // FIXME
-  // detecting that on is stale and therefor should turn off probably shouldn't
-  // be done like this
-  // perhaps there should be a car on-off state tracker and event generator in
-  // the core framework?
-  // perhaps interested code should be able to subscribe to "onChange" and
-  // "onStale" events for each metric?
-
-  /* Skip if we're processing a can frame */
-  if (!processing && StandardMetrics.ms_v_env_awake->AsBool() &&
-      StandardMetrics.ms_v_env_awake->IsStale())
-    {
-      StandardMetrics.ms_v_env_awake->SetValue(false);
-ESP_LOGI(TAG, "now asleep");
-    }
-  }
-
-OvmsVehicle::vehicle_command_t OvmsVehicleCadillaccCT5::CommandWakeup()
-  {
-  CAN_frame_t frame;
-  memset(&frame,0,sizeof(frame));
-
-  frame.origin = m_can2;
-  frame.FIR.U = 0;
-  frame.FIR.B.DLC = 1;
-  frame.FIR.B.FF = CAN_frame_std;
-  frame.MsgID = 0x102;
-  frame.data.u8[0] = 0x0a;
-  m_can2->Write(&frame);
-
-#ifdef notdef
-// XXX roadster version
-  frame.origin = m_can2;
-  frame.FIR.U = 0;
-  frame.FIR.B.DLC = 8;
-  frame.FIR.B.FF = CAN_frame_std;
-  frame.MsgID = 0x102;
-  frame.data.u8[0] = 0x06;
-  frame.data.u8[1] = 0x2c;
-  frame.data.u8[2] = 0x01;
-  frame.data.u8[3] = 0x00;
-  frame.data.u8[4] = 0x00;
-  frame.data.u8[5] = 0x09;
-  frame.data.u8[6] = 0x10;
-  frame.data.u8[7] = 0x00;
-  m_can2->Write(&frame);
-#endif
-
-  return Success;
-  }
-
-OvmsVehicle::vehicle_command_t
-OvmsVehicleCadillaccCT5::CommandLock(const char* pin)
-  {
-  return NotImplemented;
-  }
-
-OvmsVehicle::vehicle_command_t
-OvmsVehicleCadillaccCT5::CommandUnlock(const char* pin)
-  {
-  return NotImplemented;
   }
