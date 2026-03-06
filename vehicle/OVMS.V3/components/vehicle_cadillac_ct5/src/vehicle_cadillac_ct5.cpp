@@ -31,8 +31,6 @@
 #include "ovms_log.h"
 static const char *TAG = "v-cadillacct5";
 
-#define F2C(f) (((f) - 32) / 1.8)
-
 #include <stdio.h>
 #include "vehicle_cadillac_ct5.h"
 
@@ -57,8 +55,6 @@ static const OvmsPoller::poll_pid_t obdii_polls[] =
     POLL_LIST_END
   };
 
-static volatile bool processing;
-
 OvmsVehicleCadillaccCT5::OvmsVehicleCadillaccCT5()
   {
   ESP_LOGI(TAG, "Cadillac CT5 vehicle module");
@@ -82,7 +78,6 @@ void OvmsVehicleCadillaccCT5::IncomingFrameCan1(CAN_frame_t* p_frame)
   uint8_t *d;
   bool isRunning;
 
-  processing = 1;
   d = p_frame->data.u8;
   len = p_frame->FIR.B.DLC;
   if (len > sizeof(p_frame->data))
@@ -90,21 +85,25 @@ void OvmsVehicleCadillaccCT5::IncomingFrameCan1(CAN_frame_t* p_frame)
 
   switch (p_frame->MsgID)
     {
-    case 0x063:
+    case 0x2D1:
       /* Unknown pid tells us when the engine is running */
-      isRunning = (d[3] != 0);
-      if (StandardMetrics.ms_v_env_on->AsBool() != isRunning)
+      if (len == 8)
         {
-        ESP_LOGI(TAG, "running: \"%s\"", isRunning ? "yes" : "no");
-        StdMetrics.ms_v_env_on->SetValue(isRunning);
-        StdMetrics.ms_v_env_charging12v->SetValue(isRunning);
-        PollSetState(isRunning ? 1 : 0);
+        isRunning = (d[2] != 0);
+        if (StandardMetrics.ms_v_env_on->AsBool() != isRunning)
+          {
+          ESP_LOGI(TAG, "running: \"%s\"", isRunning ? "yes" : "no");
+          StdMetrics.ms_v_env_on->SetValue(isRunning);
+          StdMetrics.ms_v_env_charging12v->SetValue(isRunning);
+          PollSetState(isRunning ? 1 : 0);
+          }
         }
       break;
 
     case 0x49B:
       /* Last 8 of vin */
-      if (m_vin[1 + 8] == '\0') {
+      if (m_vin[1 + 8] == '\0')
+        {
         i = len;
         if (i > 8)
           i = 8;
@@ -115,12 +114,13 @@ void OvmsVehicleCadillaccCT5::IncomingFrameCan1(CAN_frame_t* p_frame)
           StandardMetrics.ms_v_vin->SetValue(m_vin);
 	  ESP_LOGI(TAG, "VIN: %s (pid %04x)", m_vin, p_frame->MsgID);
 	  }
-      }
+        }
       break;
 
     case 0x75F:
       /* First 8 of vin */
-      if (m_vin[0] == '\0') {
+      if (m_vin[0] == '\0')
+        {
         i = len;
         if (i > 8)
           i = 8;
@@ -133,13 +133,12 @@ void OvmsVehicleCadillaccCT5::IncomingFrameCan1(CAN_frame_t* p_frame)
           StandardMetrics.ms_v_vin->SetValue(m_vin);
 	  ESP_LOGI(TAG, "VIN: %s (pid %04x)", m_vin, p_frame->MsgID);
 	  }
-      }
+        }
       break;
 
     default:
       break;
     }
-  processing = 0;
   }
 
 void
