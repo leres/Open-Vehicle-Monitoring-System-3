@@ -61,7 +61,7 @@ OvmsVehicleCadillaccCT5::OvmsVehicleCadillaccCT5()
   {
   ESP_LOGI(TAG, "Cadillac CT5 vehicle module");
   memset(m_vin, 0, sizeof(m_vin));
-  RegisterCanBus(1, CAN_MODE_ACTIVE, CAN_SPEED_500KBPS);
+  RegisterCanBus(1, CAN_MODE_LISTEN, CAN_SPEED_500KBPS);
 #ifdef notdef
   PollSetPidList(m_can1, obdii_polls);
   PollSetState(0);
