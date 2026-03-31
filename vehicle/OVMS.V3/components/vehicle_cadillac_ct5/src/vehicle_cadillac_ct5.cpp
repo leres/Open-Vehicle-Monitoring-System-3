@@ -86,11 +86,11 @@ void OvmsVehicleCadillaccCT5::IncomingFrameCan1(CAN_frame_t* p_frame)
 
   switch (p_frame->MsgID)
     {
-    case 0x2D1:
+    case 0x063:
       /* Unknown pid tells us when the engine is running */
-      if (len == 8)
+      if (len == 6)
         {
-        isRunning = (d[2] != 0);
+        isRunning = (d[2] != 0 || d[3] != 0);
         if (StandardMetrics.ms_v_env_on->AsBool() != isRunning)
           {
           ESP_LOGI(TAG, "running: \"%s\"", isRunning ? "yes" : "no");
