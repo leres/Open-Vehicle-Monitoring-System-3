@@ -18,7 +18,7 @@ If user input chars more then it parametrs-1, chars not added to command line.*/
 /*
 Command token number, define max token it command line, if number of token
 typed in command line exceed this value, then prints message about it and
-command line not to be parced and 'execute' callback will not calls.
+command line not to be parsed and 'execute' callback will not calls.
 Token is word separate by white space, for example 3 token line:
 "IRin> set mode test" */
 #define _COMMAND_TOKEN_NMB 128
