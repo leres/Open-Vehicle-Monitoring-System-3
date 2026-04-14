@@ -165,7 +165,7 @@ public:
     virtual vehicle_command_t CommandTripStart(int verbosity, OvmsWriter* writer);
     virtual vehicle_command_t CommandTripReset(int verbosity, OvmsWriter* writer);
     virtual vehicle_command_t CommandMaintenance(int verbosity, OvmsWriter* writer);
-    virtual vehicle_command_t CommandTripCounters(int verbosity, OvmsWriter* writer);
+    virtual vehicle_command_t CommandTripCounters(int verbosity, OvmsWriter* writer, const char* title = "Trip counter values:");
     virtual vehicle_command_t CommandTripTotal(int verbosity, OvmsWriter* writer);
     virtual vehicle_command_t Command12Vcharge(int verbosity, OvmsWriter* writer);
     virtual vehicle_command_t CommandTPMSset(int verbosity, OvmsWriter* writer);
@@ -234,7 +234,8 @@ public:
     void Ticker60(uint32_t ticker) override;
     void PollerStateTicker(canbus *bus) override;
     void GetDashboardConfig(DashboardConfig& cfg);
-    virtual void CalculateEfficiency();  
+    virtual void CalculateEfficiency();
+    virtual void CalculateRangeSpeed(); 
     void NotifyVehicleIdling() override;
     void NotifiedVehicleOn() override;
     void NotifiedVehicleOff() override;
